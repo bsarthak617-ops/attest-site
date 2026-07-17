@@ -110,6 +110,7 @@
     dbgEl.textContent += msg + "\n";
   }
   if (DEBUG) {
+    document.body.classList.add("debug");
     window.addEventListener("error", (e) => dbg("ERROR: " + (e.message || (e.error && e.error.message) || e)));
   }
 
@@ -214,10 +215,10 @@
         uUpper:  { value: new THREE.Color("#F8F6F1") },
         uMid:    { value: new THREE.Color("#F4EFE6") },
         uBottom: { value: new THREE.Color("#E8E2D8") },
-        uTime:   { value: 0 }, uWash: { value: 0.04 },
-        uSunColor:    { value: new THREE.Color("#FFF3D6") },
-        uSunPos:      { value: new THREE.Vector2(0.35, 0.62) },
-        uSunIntensity:{ value: 1.35 },
+        uTime:   { value: 0 }, uWash: { value: 0.09 },
+        uSunColor:    { value: new THREE.Color("#FFE9B8") },
+        uSunPos:      { value: new THREE.Vector2(0.34, 0.64) },
+        uSunIntensity:{ value: 1.7 },
       },
       vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
       fragmentShader: NOISE + `
@@ -230,13 +231,16 @@
           col = mix(col, uTop, smoothstep(0.7, 1.0, y));
           float w = fbm2(vec2(vUv.x * 3.0 + uTime * 0.01, vUv.y * 2.0)) * 0.5 + 0.5;
           col += (w - 0.5) * uWash;
-          // Warm sun — a bright disc + soft halo. This is the light source the
-          // god-ray pass smears into shafts and bloom catches as glow.
+          // Warm sun — bright disc + soft halo + a BROAD golden morning-light
+          // flood radiating from the sun across the whole sky. The flood is what
+          // makes the frame read as "lit" (8 AM light pouring in) instead of a
+          // flat ivory field; the disc is what bloom/god-rays key off.
           vec2 sd = (vUv - uSunPos) * vec2(1.0, 1.25);
           float sl2 = dot(sd, sd);
-          float core = exp(-sl2 * 26.0) * uSunIntensity;
-          float halo = exp(-sl2 * 4.5) * uSunIntensity * 0.42;
-          col += uSunColor * (core + halo);
+          float core = exp(-sl2 * 24.0) * uSunIntensity;
+          float halo = exp(-sl2 * 3.8) * uSunIntensity * 0.5;
+          float flood = exp(-sl2 * 1.5) * uSunIntensity * 0.38;
+          col += uSunColor * (core + halo + flood);
           gl_FragColor = vec4(col, 1.0);
         }`,
       depthWrite: true, side: THREE.DoubleSide,
@@ -272,9 +276,9 @@
         uniforms: {
           uTime: { value: 0 }, uWind: { value: new THREE.Vector2(0, 0) },
           uTint: { value: new THREE.Color("#F4EFE6") },
-          uTintLit: { value: new THREE.Color("#FFF6E6") },
-          uTintShadow: { value: new THREE.Color("#D6CCBA") },
-          uOpacity: { value: 0.85 },
+          uTintLit: { value: new THREE.Color("#FFE6B8") },
+          uTintShadow: { value: new THREE.Color("#BFB098") },
+          uOpacity: { value: 1.0 },
           uScale: { value: 2.4 + i * 0.6 }, uSeed: { value: i * 13.7 + 4.1 },
           uPulse: { value: 0 },
         },
@@ -315,9 +319,9 @@
     }
     dustMat = new THREE.ShaderMaterial({
       uniforms: {
-        uTime: { value: 0 }, uWindStrength: { value: 1.0 }, uSize: { value: 1.35 },
-        uDustDensity: { value: 0.7 }, uOpacity: { value: 0.85 }, uSwirl: { value: 0 },
-        uDustColor: { value: new THREE.Color("#FBF3E2") },
+        uTime: { value: 0 }, uWindStrength: { value: 1.0 }, uSize: { value: 1.75 },
+        uDustDensity: { value: 0.85 }, uOpacity: { value: 1.0 }, uSwirl: { value: 0 },
+        uDustColor: { value: new THREE.Color("#F4D9A0") },
       },
       vertexShader: NOISE + `
         attribute float aSeed, aLayer, aSize; uniform float uTime, uWindStrength, uSize, uDustDensity, uSwirl;
@@ -1032,6 +1036,9 @@
   resize();
   window.addEventListener("resize", resize, { passive: true });
   setTimeout(resize, 300); setTimeout(resize, 1000);
+  dbg("post-resize: win=" + window.innerWidth + "x" + window.innerHeight +
+      " canvas=" + canvas.width + "x" + canvas.height + " css=" +
+      canvas.clientWidth + "x" + canvas.clientHeight);
 
   function onVis() {
     if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = null; }

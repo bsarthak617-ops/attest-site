@@ -174,11 +174,16 @@ body.no-webgl #nowgl { display: block; }
      (text stays readable: light ivory over dark warm-ink type). The solid
      var(--bg) is the fallback if color-mix is unsupported. */
   background: var(--bg);
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 52%, transparent);
   pointer-events: none;
   overflow: visible;
 }
 .panel .panel-inner { pointer-events: auto; }
+/* ?debug: nearly clear panels so the raw volumetric scene is fully visible
+   behind the content for diagnosis (overrides the 52% above). */
+body.debug .panel {
+  background: color-mix(in srgb, var(--bg) 15%, transparent);
+}
 
 /* The tower shows through here — a transparent window between chapters. */
 .spine-band {
