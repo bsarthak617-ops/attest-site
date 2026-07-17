@@ -1,0 +1,172 @@
+/* =========================================================================
+   Attest.Solutions — Design Tokens
+   "The headquarters of the world's most trusted investment research
+    institution at 8:00 AM." Warm, morning-light, architectural, editorial.
+
+   Light-first. Warm ivory base, warm-charcoal ink (never pure black),
+   one bespoke slate-blue accent, muted emerald reserved for "verified"
+   semantic states only. No rainbow. No neon. No dark fintech.
+   ========================================================================= */
+
+:root {
+  /* ---- Color · Warm ivory base ---------------------------------------- */
+  --ivory-warm:    #F8F6F1;   /* primary background */
+  --ivory-soft:    #F4EFE6;
+  --cloud-white:   #FAFAF7;
+  --linen:         #F6F2EA;
+  --warm-stone:    #ECE7DF;
+
+  --bg:            var(--ivory-warm);
+  --bg-2:          var(--cloud-white);
+  --bg-elev:       var(--cloud-white);   /* elevated panels / cards */
+  --bg-elev-2:     var(--linen);
+  --charcoal:      var(--warm-stone);
+
+  /* ---- Secondary · sky / cloud (cool breath on warm base) ------------- */
+  --sky-mist:      #EDF5FB;
+  --morning-blue:  #EAF4FD;
+  --soft-horizon:  #E8F2FA;
+  --cloud-grey:    #EEF0F2;
+  --sand:          #F2EDE5;
+
+  /* ---- Ink · warm charcoal, never pure black ------------------------- */
+  --ink-900:       #2A2722;   /* primary text */
+  --ink-700:       #4A463F;   /* secondary text */
+  --ink-500:       #6B655B;   /* muted / captions */
+  --ink-300:       #A39C90;   /* faint / hairline text */
+
+  --text:          var(--ink-900);
+  --text-2:        var(--ink-700);
+  --text-3:        var(--ink-500);
+  --text-4:        var(--ink-300);
+
+  /* ---- Surfaces & borders (warm, low-contrast) ----------------------- */
+  --surface:       rgba(42, 39, 34, 0.025);
+  --surface-2:     rgba(42, 39, 34, 0.045);
+  --surface-3:     rgba(42, 39, 34, 0.06);
+
+  --border:        rgba(42, 39, 34, 0.10);
+  --border-strong: rgba(42, 39, 34, 0.18);
+  --border-soft:   rgba(42, 39, 34, 0.06);
+  --silver:        #C9C4BA;   /* hairlines, dividers */
+
+  /* ---- The bespoke accent · muted institutional slate-blue ----------- */
+  --accent:        #3D5A73;   /* links, focus, key data, the one chromatic moment */
+  --accent-deep:   #2C445A;   /* hover / pressed */
+  --accent-2:      #5A7790;
+  --accent-soft:   #E4EBF1;   /* tint surfaces */
+  --accent-glow:   rgba(61, 90, 115, 0.18);
+
+  /* ---- Semantic · rare, reserved -------------------------------------- */
+  --verified:      #4F7A6A;   /* muted emerald — verified / positive states ONLY */
+  --verified-soft: rgba(79, 122, 106, 0.12);
+  --champagne:     #B8A37E;   /* subtle highlight — sparingly */
+  --warn:          #9A7B3A;   /* warm amber, never alert-red */
+  --danger:        #9E5A4A;   /* warm clay, never alarm-red */
+
+  --positive: var(--verified);
+  --negative: var(--danger);
+
+  /* ---- Gradients · daylight, atmosphere, horizon (never radial-neon) - */
+  --grad-sky: linear-gradient(180deg,
+      #FCFBF8 0%, #F8F6F1 40%, #F4EFE6 74%, #E8E2D8 100%);
+  --grad-morning: linear-gradient(160deg,
+      #F6F2EA 0%, #F8F6F1 45%, #EDF5FB 100%);
+  --grad-horizon: linear-gradient(180deg,
+      #EAF4FD 0%, #F4EFE6 55%, #ECE7DF 100%);
+  --grad-research: linear-gradient(180deg,
+      #F8F6F1 0%, #F2EDE5 60%, #ECE7DF 100%);
+  --grad-confidence: linear-gradient(180deg,
+      #ECE7DF 0%, #F4EFE6 50%, #F8F6F1 100%);
+  --grad-authority: linear-gradient(180deg,
+      #F4EFE6 0%, #ECE7DF 45%, #E8F2FA 100%);
+
+  --grad-line: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  --grad-text: linear-gradient(180deg, #2A2722 0%, #4A463F 100%);
+  --grad-text-accent: linear-gradient(110deg, #2A2722 0%, #3D5A73 100%);
+  --grad-glass: linear-gradient(160deg, rgba(255,255,255,0.85), rgba(255,255,255,0.55));
+  --grad-verified-line: linear-gradient(90deg, transparent, rgba(79,122,106,0.45), transparent);
+
+  /* ---- Typography · editorial-instrument family hierarchy -----------
+     ~15% serif (hero + major section titles) / ~85% Inter (everything
+     else). An institution that happens to build software — not a software
+     company trying to look like an institution.                               */
+  --font-display: "Source Serif 4", "IBM Plex Serif", Charter, Georgia, serif;  /* editorial authority — display, narrative */
+  --font-sans:    "General Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;  /* precision & product usability */
+  --font-mono:    "JetBrains Mono", "SF Mono", ui-monospace, monospace;  /* instruments only — tickers, figures, dates, IDs */
+
+  --fs-12: 0.75rem;   --fs-13: 0.8125rem;  --fs-14: 0.875rem;
+  --fs-15: 0.9375rem; --fs-16: 1rem;       --fs-18: 1.125rem;
+  --fs-20: 1.25rem;   --fs-22: 1.375rem;   --fs-24: 1.5rem;
+  --fs-28: 1.75rem;   --fs-32: 2rem;       --fs-36: 2.25rem;
+  --fs-40: 2.5rem;    --fs-48: 3rem;       --fs-56: 3.5rem;
+  --fs-64: 4rem;      --fs-72: 4.5rem;     --fs-80: 5rem;
+
+  --lh-tight: 1.05;
+  --lh-snug:  1.2;
+  --lh-base:  1.6;
+  --lh-loose: 1.75;
+
+  --ls-tight:   -0.02em;
+  --ls-tighter: -0.03em;
+  --ls-wide:    0.08em;
+  --ls-wider:   0.16em;
+  --ls-eyebrow: 0.22em;
+
+  /* ---- Spacing scale (8px base) --------------------------------------- */
+  --s-1: 4px;  --s-2: 8px;   --s-3: 12px;  --s-4: 16px;
+  --s-5: 20px; --s-6: 24px;  --s-7: 32px;  --s-8: 40px;
+  --s-9: 48px; --s-10: 64px; --s-11: 80px; --s-12: 96px;
+  --s-13: 128px; --s-14: 160px; --s-15: 200px;
+
+  /* ---- Radii · soft architectural ------------------------------------- */
+  --r-sm: 8px;  --r-md: 12px; --r-lg: 16px;
+  --r-xl: 22px; --r-2xl: 28px; --r-pill: 999px;
+
+  /* ---- Shadows / depth · soft, warm, never harsh ---------------------- */
+  --sh-1: 0 1px 2px rgba(42, 39, 34, 0.05);
+  --sh-2: 0 4px 16px rgba(42, 39, 34, 0.06);
+  --sh-3: 0 18px 50px -24px rgba(42, 39, 34, 0.18);
+  --sh-card: 0 1px 0 rgba(255,255,255,0.7) inset, 0 24px 60px -40px rgba(42,39,34,0.20);
+  --sh-glow: 0 0 0 1px var(--border), 0 20px 60px -28px var(--accent-glow);
+  --sh-plate: 0 1px 0 rgba(255,255,255,0.6) inset, 0 30px 70px -38px rgba(42,39,34,0.28);
+
+  /* ---- Blur · frosted architectural glass ----------------------------- */
+  --blur-glass: 16px;
+  --blur-strong: 28px;
+
+  /* ---- Layout --------------------------------------------------------- */
+  --container: 1200px;
+  --container-wide: 1360px;
+  --container-narrow: 760px;
+  --container-prose: 640px;
+  --nav-h: 76px;
+  --gutter: clamp(20px, 5vw, 64px);
+
+  /* ---- Motion --------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-1: 0.18s; --dur-2: 0.32s; --dur-3: 0.5s; --dur-4: 0.8s; --dur-5: 1.2s;
+  --dur-atmo: 24s;   /* atmospheric drift — slow, barely perceptible */
+
+  --z-atmosphere: 0;
+  --z-content: 2;
+  --z-nav: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+}
+
+/* ---- Chapter theming · the background evolves as you scroll ----------
+   Each chapter sets --bg to a phase of the morning, per the visual rhythm:
+   Morning Sky → Open Air → Research Environment → Financial Intelligence
+   → Institutional Confidence → Executive Precision → Quiet Authority.    */
+:root,
+[data-theme="sky"]        { --bg: var(--ivory-warm);  --bg-grad: var(--grad-sky); }
+[data-theme="air"]        { --bg: var(--cloud-white); --bg-grad: var(--grad-morning); }
+[data-theme="research"]   { --bg: var(--linen);       --bg-grad: var(--grad-research); }
+[data-theme="intelligence"]{ --bg: var(--warm-stone); --bg-grad: var(--grad-research); }
+[data-theme="confidence"] { --bg: var(--warm-stone);  --bg-grad: var(--grad-confidence); }
+[data-theme="precision"]  { --bg: var(--ivory-soft);  --bg-grad: var(--grad-authority); }
+[data-theme="authority"]  { --bg: var(--ivory-warm);  --bg-grad: var(--grad-sky); }

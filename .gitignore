@@ -1,0 +1,11 @@
+# Local Claude Code config / skills
+.claude/
+
+# Local dev screenshots
+.shots/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

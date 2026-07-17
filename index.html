@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en" data-theme="sky">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Attest — Equity research that shows its work</title>
+  <meta name="description" content="Attest is an equity-research intelligence layer for Indian markets. Deterministic code does the math, AI interprets the qualitative, and a validator gates every number — so every conclusion is one you can trace and defend." />
+  <meta name="theme-color" content="#F8F6F1" />
+  <link rel="canonical" href="https://attest.solutions/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Attest — Equity research that shows its work" />
+  <meta property="og:description" content="An equity-research intelligence layer for Indian markets, built on a no-fabrication doctrine." />
+  <meta property="og:url" content="https://attest.solutions/" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Fonts · institution-first hierarchy
+       Source Serif 4 = editorial authority (display, narrative)
+       General Sans   = precision & product usability (UI, body, labels)
+       JetBrains Mono  = instruments only — tickers, figures, dates, source IDs (<5%) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,360;8..60,420&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/world.css" />
+
+  <!-- Anti-flash: the warm gradient paints before the WebGL canvas boots.
+       The 3D scene owns light/atmosphere from there; this stays as the
+       anti-flash / reduced-motion / no-WebGL backdrop it shows through. -->
+  <style>
+    html { background: #F8F6F1; }
+    #bg-gradient {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-color: #F8F6F1;
+      background-image: linear-gradient(180deg,#FCFBF8 0%,#F8F6F1 40%,#F4EFE6 74%,#E8E2D8 100%);
+    }
+  </style>
+</head>
+<body data-experience="immersive">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Anti-flash warm backdrop -->
+  <div id="bg-gradient" aria-hidden="true"></div>
+
+  <!-- The immersive world · a single full-screen WebGL canvas you move through -->
+  <canvas id="world" aria-label="Attest — an interactive 3D research institution. Scroll to climb, drag to look, tilt to peer."></canvas>
+
+  <!-- CSS-3D tower · a real interactive experience for browsers without WebGL.
+       Same gestures as the WebGL path; built and driven by world.js. -->
+  <div id="css-scene" aria-hidden="true">
+    <div id="css-tower"></div>
+    <div class="css-haze css-haze--a"></div>
+    <div class="css-haze css-haze--b"></div>
+  </div>
+
+  <!-- Concentric-ring fallback shown only if WebGL is unavailable -->
+  <div id="world-fallback" aria-hidden="true">
+    <div class="wf-rings"></div>
+    <div class="wf-plinth"></div>
+  </div>
+
+  <!-- No-WebGL / reduced courtesy notice (honest, never fabricated) -->
+  <div id="nowgl" role="status" hidden>
+    <p><strong>This experience renders in WebGL.</strong> Your browser has it disabled, so the tower is shown as a calm still image — and you can still scroll to read every line of the research. Or <a href="mailto:hello@attest.solutions">email us for a demo</a>.</p>
+  </div>
+
+  <!-- Gesture hint · fades out after first interaction -->
+  <div id="gesture-hint" aria-hidden="true">
+    <span><span class="gh-k">Scroll</span> climb the tower</span>
+    <span><span class="gh-k">Drag</span> look around</span>
+    <span><span class="gh-k">Tilt</span> peer on mobile</span>
+  </div>
+
+  <!-- Navigation -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="Attest home">
+        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity="0.25" stroke-width="1"/>
+          <circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity="0.5" stroke-width="1"/>
+          <circle cx="16" cy="16" r="4" fill="currentColor"/>
+          <circle cx="16" cy="16" r="1.6" fill="#F8F6F1"/>
+        </svg>
+        <span class="brand-name">Attest<span class="dot">.</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#engine" data-go="engine">Engine</a>
+        <a href="#method" data-go="method">Method</a>
+        <a href="#evidence" data-go="evidence">Evidence</a>
+        <a href="#build-status" data-go="status">Build status</a>
+        <a href="#about" data-go="closing">About</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn" href="#request-demo" data-go="closing">Request a demo <span class="arrow" aria-hidden="true">→</span></a>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+          <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile drawer -->
+  <div class="drawer" id="drawer" data-open="false" aria-label="Menu">
+    <nav>
+      <a href="#engine" data-go="engine">Engine</a>
+      <a href="#method" data-go="method">Method</a>
+      <a href="#evidence" data-go="evidence">Evidence</a>
+      <a href="#build-status" data-go="status">Build status</a>
+      <a href="#about" data-go="closing">About</a>
+      <a href="#request-demo" data-go="closing">Request a demo</a>
+    </nav>
+    <p class="drawer-foot">Private beta · NSE / BSE · No fabricated proof.</p>
+  </div>
+
+  <!-- The UI overlay · chapter panels cross-fade as you climb the tower -->
+  <div id="ui">
+    <main id="main">
+
+      <!-- ===================== HERO · ARRIVAL ===================== -->
+      <section class="panel panel--hero" data-panel="hero" data-chapter="Hero" data-theme="sky" aria-label="Arrival">
+        <div class="panel-inner">
+          <span class="eyebrow"><span class="chip chip--beta"><span class="dot"></span>Private beta</span> &nbsp;Equity research intelligence</span>
+          <h1>Equity research that <span class="accent">shows its work.</span></h1>
+          <p class="lead">Attest is a research layer for Indian equities. Deterministic code does the math. AI interprets the qualitative. A validator gates every number before it reaches a conclusion — so every claim is one you can trace, and defend.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#request-demo" data-go="closing">Request a demo <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="#method" data-go="method">Read the method</a>
+          </div>
+          <div class="hero-meta">
+            <span>NSE / BSE coverage</span>
+            <span class="sep">·</span>
+            <span>106-sector matrix</span>
+            <span class="sep">·</span>
+            <span>Built on a no-fabrication doctrine</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tower spine · glimpsed between chapters as the tower climbs -->
+      <div class="spine-band" data-theme="intelligence" aria-hidden="true">
+        <div class="spine-mark"><span>02</span><i>The engine</i></div>
+      </div>
+
+      <!-- ===================== THE RESEARCH ENGINE ===================== -->
+      <section class="panel panel--engine" id="engine" data-panel="engine" data-chapter="Engine" data-theme="intelligence" aria-label="The research engine at work">
+        <div class="panel-inner panel-inner--wide">
+          <div class="engine-head">
+            <span class="eyebrow">The engine at work</span>
+            <h2>Watch the research engine think.</h2>
+            <p class="lead">A scattered morning of research resolves itself into a single auditable brief. Deterministic code owns the math; a validator gates every figure; AI only interprets the qualitative — and shows its work.</p>
+          </div>
+          <div class="engine-stage">
+            <ol class="engine-narrative" id="engine-narrative" aria-label="Research engine stages">
+              <li data-stage="1"><span class="en-num">01</span><div class="en-body"><span class="en-lbl">Research complexity</span><span class="en-sub">Scattered sources, no synthesis.</span></div></li>
+              <li data-stage="2"><span class="en-num">02</span><div class="en-body"><span class="en-lbl">Source documents emerge</span><span class="en-sub">Filings, price, news, shareholding — gathered.</span></div></li>
+              <li data-stage="3"><span class="en-num">03</span><div class="en-body"><span class="en-lbl">Validation activates</span><span class="en-sub">Every figure passes a deterministic gate.</span></div></li>
+              <li data-stage="4"><span class="en-num">04</span><div class="en-body"><span class="en-lbl">Evidence accumulates</span><span class="en-sub">Features derived in code, not by the model.</span></div></li>
+              <li data-stage="5"><span class="en-num">05</span><div class="en-body"><span class="en-lbl">Confidence rises</span><span class="en-sub">Cross-referenced; gaps surfaced as N/A.</span></div></li>
+              <li data-stage="6"><span class="en-num">06</span><div class="en-body"><span class="en-lbl">Brief assembles</span><span class="en-sub">A verified research brief, traceable to source.</span></div></li>
+            </ol>
+            <div class="engine-viz" id="engine-viz" data-stage="0" aria-hidden="true">
+              <div class="ev-nodes">
+                <div class="ev-node" data-n="1"><span class="ev-dot"></span><span class="ev-name">Sources</span><span class="ev-meta">filings · price · news</span></div>
+                <div class="ev-node" data-n="2"><span class="ev-dot"></span><span class="ev-name">Validator</span><span class="ev-meta">deterministic gate</span></div>
+                <div class="ev-node" data-n="3"><span class="ev-dot"></span><span class="ev-name">Features</span><span class="ev-meta">ratios · DuPont · FCF</span></div>
+                <div class="ev-node" data-n="4"><span class="ev-dot"></span><span class="ev-name">AI interpret</span><span class="ev-meta">two-call protocol</span></div>
+                <div class="ev-node ev-brief" data-n="5"><span class="ev-dot"></span><span class="ev-name">Brief</span><span class="ev-meta">verified research</span></div>
+              </div>
+              <div class="ev-side">
+                <div class="ev-chips" id="ev-chips">
+                  <span class="ev-chip">Revenue</span><span class="ev-chip">EBITDA</span><span class="ev-chip">CFO</span><span class="ev-chip">ROIC</span><span class="ev-chip">Promoter</span><span class="ev-chip">RS&nbsp;vs&nbsp;NIFTY</span><span class="ev-chip">Wyckoff</span><span class="ev-chip">Valuation</span>
+                </div>
+                <div class="ev-conf">
+                  <div class="ev-conf-row"><span class="ev-conf-k">Confidence</span><span class="ev-conf-val" id="ev-conf-val">—</span></div>
+                  <div class="ev-conf-bar"><span class="ev-conf-fill" id="ev-conf-fill"></span></div>
+                </div>
+                <p class="ev-cue" aria-hidden="true">Drag across the pipeline →</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tower spine · glimpsed between chapters as the tower climbs -->
+      <div class="spine-band" data-theme="precision" aria-hidden="true">
+        <div class="spine-mark"><span>03</span><i>The method</i></div>
+      </div>
+
+      <!-- ===================== THE METHOD ===================== -->
+      <section class="panel panel--method" id="method" data-panel="method" data-chapter="Method" data-theme="precision" aria-label="The method">
+        <div class="panel-inner panel-inner--narrow">
+          <div class="section-head">
+            <span class="eyebrow">The method</span>
+            <h2>One boundary makes the whole system honest.</h2>
+            <p class="lead">The deterministic-vs-interpretational boundary is the doctrine competitors don’t have. It decides what the model is allowed to do — and what it is forbidden to do.</p>
+          </div>
+
+          <div class="method-grid">
+            <details class="card module">
+              <summary>
+                <span class="step">01 · Deterministic core</span>
+                <h3>Code owns the math.</h3>
+                <p>Valuation, ratios, features and temporal isolation are computed in code — never delegated to a model.</p>
+                <span class="chip"><span class="dot"></span>No AI in the arithmetic</span>
+                <span class="module-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </summary>
+              <div class="module-body"><div class="module-inner">
+                <div class="mrows">
+                  <div class="mrow"><span class="mk">Input</span><span class="mv">Raw filings, price series, shareholding and macro feeds.</span></div>
+                  <div class="mrow"><span class="mk">Processing</span><span class="mv">Code computes ratios, DuPont decomposition, free cash flow, valuation and features — under temporal isolation.</span></div>
+                  <div class="mrow"><span class="mk">Validation</span><span class="mv">Closed-form arithmetic, unit-tested. No model sits in the path.</span></div>
+                  <div class="mrow"><span class="mk">Output</span><span class="mv">Every figure carries its source and as-of date.</span></div>
+                  <div class="mrow mrow--why"><span class="mk">Why it matters</span><span class="mv">Numbers you can reproduce by hand. No hallucinated arithmetic ever reaches a signal.</span></div>
+                </div>
+              </div></div>
+            </details>
+
+            <details class="card module">
+              <summary>
+                <span class="step">02 · Interpretational AI</span>
+                <h3>AI interprets, never asserts.</h3>
+                <p>The model synthesises unstructured text and qualitative reasoning — only where no closed-form rule exists.</p>
+                <span class="chip"><span class="dot"></span>Two-call protocol</span>
+                <span class="module-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </summary>
+              <div class="module-body"><div class="module-inner">
+                <div class="mrows">
+                  <div class="mrow"><span class="mk">Input</span><span class="mv">Management commentary, news tone, filings narrative.</span></div>
+                  <div class="mrow"><span class="mk">Processing</span><span class="mv">Two-call protocol: call 1 extracts claims with citations; call 2 re-checks them against the deterministic facts. Deterministic orchestration between.</span></div>
+                  <div class="mrow"><span class="mk">Validation</span><span class="mv">Claims must cite source spans; contradictions are flagged, not smoothed.</span></div>
+                  <div class="mrow"><span class="mk">Output</span><span class="mv">Qualitative interpretation only — never a numeric assertion.</span></div>
+                  <div class="mrow mrow--why"><span class="mk">Why it matters</span><span class="mv">The model only does what only a model can do: synthesis, never arithmetic.</span></div>
+                </div>
+              </div></div>
+            </details>
+
+            <details class="card module">
+              <summary>
+                <span class="step">03 · The validator gate</span>
+                <h3>Every AI number is checked.</h3>
+                <p>AI output must pass deterministic validator gates before it enters any signal. AI is a source; the validator is the gatekeeper.</p>
+                <span class="chip chip--verified"><span class="dot"></span>AI is a source, not the verdict</span>
+                <span class="module-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </summary>
+              <div class="module-body"><div class="module-inner">
+                <div class="mrows">
+                  <div class="mrow"><span class="mk">Input</span><span class="mv">Any AI-produced number or claim.</span></div>
+                  <div class="mrow"><span class="mk">Processing</span><span class="mv">Deterministic gates — type, range, cross-reference, consistency.</span></div>
+                  <div class="mrow"><span class="mk">Validation</span><span class="mv">A fail excludes the value — it is never silently substituted. The reason is logged.</span></div>
+                  <div class="mrow"><span class="mk">Output</span><span class="mv">Only gate-passed figures enter a signal.</span></div>
+                  <div class="mrow mrow--why"><span class="mk">Why it matters</span><span class="mv">The verdict is never a black box — every figure is either traced to a deterministic source or excluded with a reason.</span></div>
+                </div>
+              </div></div>
+            </details>
+          </div>
+
+          <div class="method-bound"><span class="line"></span>The boundary is the product<span class="line"></span></div>
+        </div>
+      </section>
+
+      <!-- Tower spine · glimpsed between chapters as the tower climbs -->
+      <div class="spine-band" data-theme="research" aria-hidden="true">
+        <div class="spine-mark"><span>04</span><i>Evidence</i></div>
+      </div>
+
+      <!-- ===================== EVIDENCE · A REAL ARTIFACT ===================== -->
+      <section class="panel panel--evidence" id="evidence" data-panel="evidence" data-chapter="Evidence" data-theme="research" aria-label="Evidence — a real artifact">
+        <div class="panel-inner panel-inner--wide">
+          <div class="evidence-head">
+            <span class="eyebrow">Evidence · a real artifact</span>
+            <h2>Don’t take our word for it. Read the system’s own output.</h2>
+            <p class="lead">This is the actual market brief the Attest pipeline produced for Tata Power on 16 July 2026 — not a mock. The technical read is real and deterministic. The gaps are real too, and we leave them visible.</p>
+          </div>
+
+          <figure class="plate">
+            <div class="plate-bar">
+              <span class="ticker">TATAPOWER <span class="cmp">₹376.95</span></span>
+              <span class="meta">As of 2026-07-16</span>
+              <span class="spacer"></span>
+              <span class="chip chip--verified"><span class="dot"></span>Real system output</span>
+            </div>
+
+            <div class="plate-body">
+              <div class="plate-figure">
+                <div class="fig-lenses" role="tablist" aria-label="Chart layers rendered by the engine">
+                  <button class="fig-lens is-active" type="button" data-lens="pivot" role="tab" aria-selected="true">Pivot extrema</button>
+                  <button class="fig-lens" type="button" data-lens="trend" role="tab" aria-selected="false">Multi-horizon trendlines</button>
+                  <button class="fig-lens" type="button" data-lens="vsa" role="tab" aria-selected="false">VSA accumulation</button>
+                </div>
+                <div class="fig-frame">
+                  <img src="assets/tata-power-daily.png" alt="Tata Power daily chart rendered by the Attest charting engine — pivot-extrema, multi-horizon trendlines, VSA accumulation audit" loading="lazy" width="1600" height="900" />
+                </div>
+                <div class="fig-note" id="fig-note" aria-live="polite" data-lens="pivot">Pivot-extrema mining — local highs and lows are identified at three horizons, then ranked by swing magnitude. Deterministic; no model in the path.</div>
+                <figcaption>Fig. 1 — TATAPOWER, daily. Rendered by the Attest charting engine: pivot-extrema mining, OLS-rejected multi-horizon trendlines, VSA accumulation auditing. <span class="verified">Real render, unretouched.</span></figcaption>
+              </div>
+
+              <div class="plate-brief">
+                <h4>The 20-point brief · deterministic</h4>
+                <div class="brief-lines">
+                  <div class="brief-line" data-prov="Source: NSE daily OHLC · deterministic EMA" tabindex="0"><span class="k">Price structure</span><span class="v">EMA 20D <span class="down">−1.8%</span> · 50D <span class="down">−4.4%</span> · 200D <span class="down">−4.4%</span> · ALIGN BEAR3</span></div>
+                  <div class="brief-line" data-prov="Source: price structure · interpretational (qualitative only)" tabindex="0"><span class="k">Wyckoff</span><span class="v">PHASE MARKDOWN · SUB RALLY_TEST · CONFIDENCE LOW</span></div>
+                  <div class="brief-line" data-prov="Source: NSE daily · deterministic ROC / RSI" tabindex="0"><span class="k">Momentum</span><span class="v">ROC 1M <span class="down">−6.3%</span> · 3M <span class="down">−10.6%</span> · RSI 38.4 · REGIME LOW_VOL</span></div>
+                  <div class="brief-line" data-prov="Source: TATAPOWER vs NIFTY · deterministic" tabindex="0"><span class="k">Relative strength</span><span class="v">vs NIFTY 1M <span class="down">−17.86</span> · STATUS LAGGARD</span></div>
+                  <div class="brief-line" data-prov="Source: latest shareholding filing · deterministic" tabindex="0"><span class="k">Holdings</span><span class="v">PROMO 46.9% (PLEDGE N/A) · FII 10.0% · DII 45.3%</span></div>
+                  <div class="brief-line" data-prov="Source: filings + 106-sector matrix · deterministic" tabindex="0"><span class="k">Valuation</span><span class="v">PE 23.5 · SECTOR_PE 32.2 · PREMIUM <span class="down">−26.9%</span></span></div>
+                  <div class="brief-line is-na" data-prov="Source: not available this cycle · emitted as N/A — never fabricated" tabindex="0"><span class="k">Institutional flow</span><span class="v">FII_NET <span class="na">N/A</span> · DII_NET <span class="na">N/A</span> · DII_ABSORB <span class="na">N/A</span></span></div>
+                  <div class="brief-line is-na" data-prov="Source: not ingested yet · emitted as N/A — never fabricated" tabindex="0"><span class="k">F&amp;O / macro</span><span class="v">PCR <span class="na">N/A</span> · INDIA_VIX <span class="na">N/A</span> · REGIME <span class="na">N/A</span></span></div>
+                </div>
+              </div>
+            </div>
+          </figure>
+
+          <div class="evidence-note">
+            <svg class="mark" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.2"/><path d="M6 10.5l2.5 2.5L14 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <p><strong>This is what the system produces today.</strong> The technical read is real and deterministic. The institutional and macro dimensions are emitted as N/A, because the data was not available and the doctrine forbids inventing it. Intrinsic valuation (DCF, EBO, DDM) is still being built — so rather than fabricate a fair value, the verdict degrades honestly. <strong>An honest limited verdict beats a fabricated complete one.</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tower spine · glimpsed between chapters as the tower climbs -->
+      <div class="spine-band" data-theme="confidence" aria-hidden="true">
+        <div class="spine-mark"><span>05</span><i>Build status</i></div>
+      </div>
+
+      <!-- ===================== HONEST BUILD STATUS ===================== -->
+      <section class="panel panel--status" id="build-status" data-panel="status" data-chapter="Status" data-theme="confidence" aria-label="Honest build status">
+        <div class="panel-inner panel-inner--wide">
+          <div class="card status-card">
+            <div>
+              <span class="eyebrow">Build status · transparent</span>
+              <h3>We show you what’s built, what’s in progress, and what isn’t.</h3>
+              <p class="lead">No fabricated logos. No invented metrics. No security badges we haven’t earned. The roadmap below is the engineer’s honest contract with the future — drawn from our own gap inventory.</p>
+              <a class="btn btn--ghost" href="#request-demo" data-go="closing">Request a demo <span class="arrow" aria-hidden="true">→</span></a>
+            </div>
+            <div class="status-grid">
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">Data acquisition</div><div class="sub">Business Standard · Tijori Finance · NSE · MCA</div></div>
+                  <span class="pill pill--built">Built</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">Multi-source ingest with a normalized schema — daily EOD, fundamentals, shareholding and macro.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Business Standard · Tijori Finance · NSE · MCA</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#evidence" data-go="evidence">See a real worked example →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">Institutional charting</div><div class="sub">Pivot-extrema · OLS-rejected trendlines · VSA audit</div></div>
+                  <span class="pill pill--built">Built</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">Pivot-extrema mining, OLS-rejected multi-horizon trendlines, and a VSA accumulation audit — all deterministic.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Data acquisition</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#method" data-go="method">The deterministic core →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">20-point market brief</div><div class="sub">Deterministic · honest N/A discipline</div></div>
+                  <span class="pill pill--built">Built</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">A deterministic 20-point brief. Every figure carries its source and as-of date; missing dimensions are emitted as N/A, never fabricated.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Data acquisition · Institutional charting</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#evidence" data-go="evidence">Read a real brief →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">106-sector matrix</div><div class="sub">NSMIM 6-layer · SRIM 5-phase playbooks</div></div>
+                  <span class="pill pill--built">Built</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">NSMIM 6-layer and SRIM 5-phase sector playbooks — an India-specific lens, not a generic global framework.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Data acquisition</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#method" data-go="method">Why the boundary matters →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">Intrinsic valuation</div><div class="sub">DCF · EBO · DDM · multiples · sum-of-parts</div></div>
+                  <span class="pill pill--progress">In progress</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">DCF, EBO, DDM, multiples and sum-of-parts — a deterministic valuation core under construction. Rather than fabricate a fair value today, the verdict degrades honestly.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Data acquisition · 106-sector matrix</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#method" data-go="method">The deterministic core →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">Signal synthesis</div><div class="sub">BUY / SELL / HOLD · conviction · confidence band</div></div>
+                  <span class="pill pill--progress">In progress</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">BUY / SELL / HOLD with a conviction level and confidence band. Validator-gated; no AI number flows directly into the verdict.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Intrinsic valuation · 20-point brief · 106-sector matrix</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#method" data-go="method">The validator gate →</a></span></div>
+                </div>
+              </details>
+
+              <details class="status-row">
+                <summary>
+                  <div class="sr-head"><div class="label">Trade plan · backend · auth · API</div><div class="sub">Sizing · SSO · multi-tenancy · REST</div></div>
+                  <span class="pill pill--planned">Planned</span>
+                  <span class="sr-cue" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </summary>
+                <div class="status-body">
+                  <div class="sb-row"><span class="sb-k">Implementation</span><span class="sb-v">Position sizing, SSO, multi-tenancy and a REST API — the operational layer on top of the research engine. Not yet started.</span></div>
+                  <div class="sb-row"><span class="sb-k">Depends on</span><span class="sb-v">Signal synthesis</span></div>
+                  <div class="sb-row"><span class="sb-k">Read more</span><span class="sb-v"><a href="#request-demo" data-go="closing">Talk to us about the roadmap →</a></span></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tower spine · glimpsed between chapters as the tower climbs -->
+      <div class="spine-band" data-theme="authority" aria-hidden="true">
+        <div class="spine-mark"><span>06</span><i>Attest</i></div>
+      </div>
+
+      <!-- ===================== CLOSING ===================== -->
+      <section class="panel panel--closing" id="request-demo" data-panel="closing" data-chapter="Closing" data-theme="authority" aria-label="Request a demo">
+        <div class="panel-inner panel-inner--narrow">
+          <span class="eyebrow">Request a demo</span>
+          <h2>See the work before you trust the verdict.</h2>
+          <p class="lead">We’ll walk you through the doctrine, a real worked example, and the honest roadmap — including exactly what isn’t built yet. No aggressive funnel, no fabricated proof.</p>
+          <a class="btn" href="mailto:hello@attest.solutions">Request a demo <span class="arrow" aria-hidden="true">→</span></a>
+          <p class="fine">Private beta · NSE / BSE · Built on a no-fabrication doctrine</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer" id="about">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <a class="brand" href="./" aria-label="Attest home" data-go="hero">
+            <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity="0.25" stroke-width="1"/>
+              <circle cx="16" cy="16" r="9" stroke="currentColor" stroke-opacity="0.5" stroke-width="1"/>
+              <circle cx="16" cy="16" r="4" fill="currentColor"/>
+              <circle cx="16" cy="16" r="1.6" fill="#F8F6F1"/>
+            </svg>
+            <span class="brand-name">Attest<span class="dot">.</span></span>
+          </a>
+          <p>Equity research that shows its work. An intelligence layer for Indian markets, built on a doctrine that refuses to fabricate.</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h5>Platform</h5>
+            <a href="#method" data-go="method">The method</a>
+            <a href="#evidence" data-go="evidence">Evidence</a>
+            <a href="#build-status" data-go="status">Build status</a>
+            <a href="#engine" data-go="engine">Engine</a>
+          </div>
+          <div class="footer-col">
+            <h5>Company</h5>
+            <a href="#about" data-go="closing">About</a>
+            <a href="#request-demo" data-go="closing">Pricing</a>
+            <a href="mailto:hello@attest.solutions">Contact</a>
+            <a href="#request-demo" data-go="closing">Request a demo</a>
+          </div>
+          <div class="footer-col">
+            <h5>Resources</h5>
+            <a href="#">Documentation</a>
+            <a href="#">Research</a>
+            <a href="#">Methodology</a>
+            <a href="#">Changelog</a>
+          </div>
+        </div>
+      </div>
+      <div class="container footer-base">
+        <span>© 2026 Attest.Solutions — Built on a no-fabrication doctrine.</span>
+        <span>Not investment advice.</span>
+      </div>
+    </footer>
+  </div>
+
+  <noscript>
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#F8F6F1;color:#2A2722;font-family:Georgia,serif;padding:2rem;text-align:center;">
+      <p style="max-width:42ch;line-height:1.6;">Attest is an interactive experience that needs JavaScript. Email <a href="mailto:hello@attest.solutions" style="color:#3D5A73;">hello@attest.solutions</a> for a demo and a walkthrough of the doctrine, a real worked example, and the honest roadmap.</p>
+    </div>
+  </noscript>
+
+  <!-- DEV-ONLY: hash-scroll hook for headless screenshots (removed before ship) -->
+  <script>window.addEventListener('load',function(){var m=/scroll=(-?\d+)/.exec(location.hash||'');if(m){window.scrollTo(0,+m[1]);}});</script>
+
+  <!-- GSAP (UI tweens only, CDN) + three.js vendored locally (r136 UMD global) -->
+  <script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="js/vendor/three.min.js" defer></script>
+
+  <!-- three.js r136 post-processing (UMD, attach to THREE). Order matters:
+       CopyShader must load before EffectComposer/ShaderPass; shader libs
+       before the passes that reference them. Vendored from r136 examples/js. -->
+  <script src="js/vendor/shaders/CopyShader.js" defer></script>
+  <script src="js/vendor/postprocessing/EffectComposer.js" defer></script>
+  <script src="js/vendor/postprocessing/RenderPass.js" defer></script>
+  <script src="js/vendor/postprocessing/ShaderPass.js" defer></script>
+  <script src="js/vendor/postprocessing/MaskPass.js" defer></script>
+  <script src="js/vendor/shaders/LuminosityHighPassShader.js" defer></script>
+  <script src="js/vendor/postprocessing/UnrealBloomPass.js" defer></script>
+  <script src="js/vendor/shaders/BokehShader.js" defer></script>
+  <script src="js/vendor/postprocessing/BokehPass.js" defer></script>
+
+  <!-- Shared noise library (GLSL string + JS port) for the atmosphere -->
+  <script src="js/lib/noise.glsl.js" defer></script>
+
+  <script src="js/world.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
