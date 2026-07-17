@@ -452,6 +452,10 @@
     /* ---------- Post-processing pipeline (Phases 3, 4, 7) ---------- */
     buildComposer();
     applyTierToScene();
+    dbg("webgl built: fog=" + fogMeshes.length + " dust=" + tier.dust +
+        " accent=" + tier.accent + " ribbons=" + tier.ribbons +
+        " composerPasses=" + (composer ? composer.passes.length : 0) +
+        " canvas=" + canvas.width + "x" + canvas.height);
   }
 
   /* ---- Post-FX shader definitions + composer assembly ---- */
@@ -989,21 +993,26 @@
     // 8) paint
     if (mode === "webgl") {
       try {
-        composer.render();
+        // ?debug renders the RAW scene (bypass the post chain) to isolate
+        // "scene broken" from "composer/post chain blacking it out".
+        if (DEBUG) renderer.render(scene, camera);
+        else composer.render();
       } catch (e) {
         dbg("render error (loop stopped): " + (e && e.message));
         if (raf) cancelAnimationFrame(raf);
         raf = null;
         throw e;
       }
-      // adaptive quality: downgrade on sustained slow frames (sticks, no flap-up)
-      ema = ema * 0.92 + dt * 0.08;
-      if (ema > tier.ceiling) overCeiling++; else overCeiling = 0;
-      if (overCeiling > 40 && tierName !== "low") {
-        tierName = tierName === "high" ? "mid" : "low";
-        tier = TIERS[tierName]; applyTierToScene(); resize();
-        overCeiling = 0;
-        console.warn("[Attest] quality downgrade →", tierName);
+      if (!DEBUG) {
+        // adaptive quality: downgrade on sustained slow frames (sticks, no flap-up)
+        ema = ema * 0.92 + dt * 0.08;
+        if (ema > tier.ceiling) overCeiling++; else overCeiling = 0;
+        if (overCeiling > 40 && tierName !== "low") {
+          tierName = tierName === "high" ? "mid" : "low";
+          tier = TIERS[tierName]; applyTierToScene(); resize();
+          overCeiling = 0;
+          console.warn("[Attest] quality downgrade →", tierName);
+        }
       }
     } else {
       renderCSS(c);
@@ -1027,8 +1036,8 @@
     document.body.classList.add("is-static");
     if (mode === "webgl") {
       applyPaletteAndCamera(performance.now() / 1000);
-      composer.render();
-      window.addEventListener("resize", () => { resize(); composer.render(); });
+      if (DEBUG) renderer.render(scene, camera); else composer.render();
+      window.addEventListener("resize", () => { resize(); if (DEBUG) renderer.render(scene, camera); else composer.render(); });
     } else {
       renderCSS(0);
     }
