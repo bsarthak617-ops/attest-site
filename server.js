@@ -28,7 +28,14 @@ http.createServer((req, res) => {
   if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end("Forbidden"); }
   fs.readFile(file, (err, data) => {
     if (err) { res.writeHead(404); return res.end("Not found"); }
-    res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });
+    // Dev server: never let the browser cache stale JS/CSS/HTML — every request
+    // re-fetches from disk so edits show up on a plain refresh (no Ctrl+Shift+R).
+    res.writeHead(200, {
+      "Content-Type": TYPES[path.extname(file)] || "application/octet-stream",
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+    });
     res.end(data);
   });
 }).listen(PORT, () => {
