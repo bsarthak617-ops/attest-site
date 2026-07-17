@@ -170,7 +170,11 @@ body.no-webgl #nowgl { display: block; }
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh;
   padding: calc(var(--nav-h) + var(--s-9)) var(--gutter) var(--s-10);
+  /* Translucent so the volumetric world glows through behind the content
+     (text stays readable: light ivory over dark warm-ink type). The solid
+     var(--bg) is the fallback if color-mix is unsupported. */
   background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
   pointer-events: none;
   overflow: visible;
 }
