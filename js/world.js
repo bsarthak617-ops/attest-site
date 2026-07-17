@@ -481,20 +481,24 @@
     bokehPass.enabled = tier.dof;
     composer.addPass(bokehPass);
 
-    // God rays — screen-space radial accumulation that smears the sky's sun glow
-    // into visible warm shafts. Exposure/strength tuned so shafts clearly read
-    // against the warm base (the prior 0.22/0.6 settings were invisible).
+    // God rays — screen-space radial accumulation that smears the sun glow into
+    // warm shafts. CRITICAL: a BRIGHT-PASS gates each sample so only the sun core
+    // + brightest lit-fog tops feed the accumulation. Without it, the uniformly
+    // bright warm sky gets sampled along every ray path and the whole frame adds
+    // ~+0.5 of light → clamps to solid white ("plain background, no animation").
+    // The bright-pass keeps the wash bounded so shafts read near the sun and the
+    // rest of the frame stays the warm base.
     godrayPass = new THREE.ShaderPass({
       uniforms: {
         tDiffuse: { value: null },
         uLightPos: { value: new THREE.Vector2(0.35, 0.62) },
-        uExposure: { value: 1.0 }, uDecay: { value: 0.965 }, uDensity: { value: 0.92 },
-        uWeight: { value: 1.0 }, uStrength: { value: 1.0 },
-        uTint: { value: new THREE.Color("#FFE9C8") },
+        uExposure: { value: 0.45 }, uDecay: { value: 0.95 }, uDensity: { value: 0.9 },
+        uWeight: { value: 0.6 }, uStrength: { value: 0.55 }, uBright: { value: 0.9 },
+        uTint: { value: new THREE.Color("#FFE6C2") },
       },
       vertexShader: fullscreenVert(),
       fragmentShader: `
-        uniform sampler2D tDiffuse; uniform vec2 uLightPos; uniform float uExposure, uDecay, uDensity, uWeight, uStrength;
+        uniform sampler2D tDiffuse; uniform vec2 uLightPos; uniform float uExposure, uDecay, uDensity, uWeight, uStrength, uBright;
         uniform vec3 uTint; varying vec2 vUv;
         #define NSAMPLES 40
         void main(){
@@ -503,7 +507,11 @@
           float illum = 1.0; vec3 acc = vec3(0.0); vec2 pos = vUv;
           for (int i = 0; i < NSAMPLES; i++){
             pos -= delta;
-            acc += texture2D(tDiffuse, pos).rgb * illum * uWeight;
+            vec3 s = texture2D(tDiffuse, pos).rgb;
+            float lum = dot(s, vec3(0.299, 0.587, 0.114));
+            // bright-pass: only luminance above uBright contributes to the shafts
+            s *= smoothstep(uBright, 1.0, lum);
+            acc += s * illum * uWeight;
             illum *= uDecay;
           }
           vec3 rays = acc * uTint * (uExposure * uStrength) / float(NSAMPLES);
