@@ -92,6 +92,27 @@
   }
   document.body.classList.add(mode === "webgl" ? "webgl-mode" : "css-mode");
 
+  /* ---- ?debug diagnostic overlay (opt-in via query param; invisible to
+     normal visitors). Surfaces render mode, tier, and any runtime/shader
+     error so a "plain background" can be diagnosed without DevTools. ---- */
+  const DEBUG = /[?&]debug\b/.test(location.search);
+  let dbgEl = null;
+  function dbg(msg) {
+    if (!DEBUG) return;
+    if (!dbgEl) {
+      dbgEl = document.createElement("div");
+      dbgEl.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:9999;max-width:60vw;" +
+        "padding:8px 10px;font:11px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;" +
+        "background:rgba(20,18,14,0.92);color:#FFE9C8;border:1px solid rgba(255,233,200,0.4);" +
+        "border-radius:6px;pointer-events:none;";
+      document.body.appendChild(dbgEl);
+    }
+    dbgEl.textContent += msg + "\n";
+  }
+  if (DEBUG) {
+    window.addEventListener("error", (e) => dbg("ERROR: " + (e.message || (e.error && e.error.message) || e)));
+  }
+
   /* =====================================================================
      QUALITY TIERS · adaptive scaling (Phase 7)
      ===================================================================== */
@@ -112,6 +133,10 @@
   }
   let tierName = guessTier();
   let tier = TIERS[tierName];
+  dbg("init: mode=" + mode + "  tier=" + tierName +
+      "  cores=" + (navigator.hardwareConcurrency || "?") +
+      "  dpr=" + (window.devicePixelRatio || 1).toFixed(2) +
+      "  ua=" + (navigator.userAgent || "").slice(0, 60));
 
   /* =====================================================================
      CHAPTER PALETTE · per-chapter atmosphere keyframes (Phase 6)
@@ -963,7 +988,14 @@
 
     // 8) paint
     if (mode === "webgl") {
-      composer.render();
+      try {
+        composer.render();
+      } catch (e) {
+        dbg("render error (loop stopped): " + (e && e.message));
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+        throw e;
+      }
       // adaptive quality: downgrade on sustained slow frames (sticks, no flap-up)
       ema = ema * 0.92 + dt * 0.08;
       if (ema > tier.ceiling) overCeiling++; else overCeiling = 0;
